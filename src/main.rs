@@ -28,7 +28,7 @@ fn main() {
         layout.update_views(&display);
 
         let mut target = display.draw();
-        target.clear_color_and_depth((0.0, 0.0, 0.0, 0.0), 1.0);
+        target.clear_color_srgb(0.14, 0.18, 0.21, 1.0);
         layout.draw(&display, &mut target);
         target.finish().unwrap();
 

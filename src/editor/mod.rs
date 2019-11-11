@@ -42,7 +42,7 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
             bounds: (screen_dims.0 as f32 - self.padding, screen_dims.1 as f32 - self.padding),
             screen_position: ((self.padding / 2.0), (self.padding / 2.0)),
             scale: glyph_brush::rusttype::Scale::uniform(self.font_size),
-            color: [1.0, 1.0, 1.0, 1.0],
+            color: [0.92, 0.99, 0.99, 1.0],
             ..Section::default()
         });
     }
