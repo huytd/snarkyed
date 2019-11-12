@@ -11,7 +11,7 @@ use buffer::Buffer;
 use cursor::Cursor;
 
 use crate::layout_manager::View;
-use crate::constants::{ NO_MODIFIERS, CTRL_HOLD, SHIFT_HOLD };
+use crate::constants::{ NO_MODIFIERS, CTRL_HOLD, SHIFT_HOLD, BASE_FONT_SIZE };
 
 pub struct EditorView<'a, 'b> {
     pub buffer: Buffer,
@@ -29,7 +29,8 @@ impl<'a, 'b> EditorView<'a, 'b> {
     pub fn new(file: &str, display: &Display) -> EditorView<'a, 'b> {
         let font_regular: &[u8] = include_bytes!("../../assets/haskplex.ttf");
         let fonts = vec![Font::from_bytes(font_regular).unwrap()];
-        let font_size = 16.0 * 2.0;
+        let hidpi_factor = display.gl_window().window().get_hidpi_factor() as f32;
+        let font_size = BASE_FONT_SIZE * hidpi_factor;
         let mut gb = GlyphBrush::new(display, fonts);
         let letter_size = gb.glyph_bounds(Section {
             text: "0",
@@ -125,6 +126,9 @@ impl<'a, 'b> EditorView<'a, 'b> {
 
 impl<'a, 'b> View for EditorView<'a, 'b> {
     fn update(&mut self, display: &Display) {
+        let hidpi_factor = display.gl_window().window().get_hidpi_factor() as f32;
+        self.font_size = BASE_FONT_SIZE * hidpi_factor;
+
         let screen_dims = display.get_framebuffer_dimensions();
         self.viewport_rows = (screen_dims.1 as f32 / self.font_size) as usize;
 

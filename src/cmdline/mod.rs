@@ -5,7 +5,7 @@ use glium_glyph::GlyphBrush;
 use glium_glyph::glyph_brush::rusttype::Rect;
 
 use crate::layout_manager::View;
-use crate::constants::{NO_MODIFIERS, CTRL_HOLD, SHIFT_HOLD, CMD_SHIFT_HOLD};
+use crate::constants::{NO_MODIFIERS, CTRL_HOLD, SHIFT_HOLD, CMD_SHIFT_HOLD, BASE_FONT_SIZE};
 
 const BORDER_TEXT: &str = r#"┌──────────────────────────────────────────────────┐
 │                                                  |
@@ -24,8 +24,9 @@ impl<'a, 'b> CmdlineView<'a, 'b> {
     pub fn new(display: &Display) -> CmdlineView<'a, 'b> {
         let font_regular: &[u8] = include_bytes!("../../assets/haskplex.ttf");
         let fonts = vec![Font::from_bytes(font_regular).unwrap()];
-        let font_size = 16.0 * 2.0;
         let mut gb = GlyphBrush::new(display, fonts);
+        let hidpi_factor = display.gl_window().window().get_hidpi_factor() as f32;
+        let font_size = BASE_FONT_SIZE * hidpi_factor;
         let letter_size = gb.glyph_bounds(Section {
             text: "0",
             scale: glyph_brush::rusttype::Scale::uniform(font_size),
@@ -44,6 +45,9 @@ impl<'a, 'b> CmdlineView<'a, 'b> {
 
 impl<'a, 'b> View for CmdlineView<'a, 'b> {
     fn update(&mut self, display: &Display) {
+        let hidpi_factor = display.gl_window().window().get_hidpi_factor() as f32;
+        self.font_size = BASE_FONT_SIZE * hidpi_factor;
+
         let screen_dims = display.get_framebuffer_dimensions();
         self.glyph_brush.queue(Section {
             text: BORDER_TEXT,
