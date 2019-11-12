@@ -40,10 +40,11 @@ fn main() {
                         input: glutin::KeyboardInput {
                             virtual_keycode: Some(virtual_code),
                             state,
+                            modifiers,
                             ..
                         },
                         ..
-                    } => layout.handle_input(virtual_code, state),
+                    } => layout.handle_input(virtual_code, state, modifiers),
                     _ => (),
                 },
                 _ => (),

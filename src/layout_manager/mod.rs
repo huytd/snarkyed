@@ -1,11 +1,11 @@
 extern crate glium;
-use glium::glutin::{VirtualKeyCode, ElementState};
+use glium::glutin::{VirtualKeyCode, ElementState, ModifiersState};
 use glium::{Display, Frame};
 
 pub trait View {
   fn update(&mut self, display: &Display);
   fn draw(&mut self, display: &Display, target: &mut Frame);
-  fn handle_input(&mut self, key_code: VirtualKeyCode, state: ElementState);
+  fn handle_input(&mut self, key_code: VirtualKeyCode, state: ElementState, modifiers: ModifiersState);
 }
 
 pub struct LayoutManager {
@@ -30,9 +30,9 @@ impl LayoutManager {
     }
   }
 
-  pub fn handle_input(&mut self, key_code: VirtualKeyCode, state: ElementState) {
+  pub fn handle_input(&mut self, key_code: VirtualKeyCode, state: ElementState, modifiers: ModifiersState) {
     for view in self.views.iter_mut() {
-      view.handle_input(key_code, state);
+      view.handle_input(key_code, state, modifiers);
     }
   }
 }
