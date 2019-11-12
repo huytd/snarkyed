@@ -11,18 +11,7 @@ use buffer::Buffer;
 use cursor::Cursor;
 
 use crate::layout_manager::View;
-
-const NO_MODIFIERS: ModifiersState = ModifiersState {
-    alt: false, ctrl: false, logo: false, shift: false
-};
-
-const SHIFT_HOLD: ModifiersState = ModifiersState {
-    alt: false, ctrl: false, logo: false, shift: true
-};
-
-const CTRL_HOLD: ModifiersState = ModifiersState {
-    alt: false, ctrl: true, logo: false, shift: false
-};
+use crate::constants::{ NO_MODIFIERS, CTRL_HOLD, SHIFT_HOLD };
 
 pub struct EditorView<'a, 'b> {
     pub buffer: Buffer,
@@ -157,7 +146,7 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
             scale: glyph_brush::rusttype::Scale::uniform(self.font_size),
             color: [0.92, 0.99, 0.99, 0.4],
             ..Section::default()
-        })
+        });
     }
 
     fn draw(&mut self, display: &Display, target: &mut Frame) {

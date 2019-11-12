@@ -1,12 +1,16 @@
 extern crate glium;
 extern crate glium_glyph;
+
 use glium::{glutin, Surface};
 
+mod constants;
 mod layout_manager;
 mod editor;
+mod cmdline;
 
 use layout_manager::{ LayoutManager };
 use editor::EditorView;
+use cmdline::CmdlineView;
 
 fn main() {
     let mut events_loop = glutin::EventsLoop::new();
@@ -18,7 +22,8 @@ fn main() {
 
     let mut layout = LayoutManager {
         views: vec![
-            Box::new(EditorView::new("assets/source.txt", &display))
+            Box::new(EditorView::new("assets/source.txt", &display)),
+            Box::new(CmdlineView::new(&display))
         ]
     };
 
