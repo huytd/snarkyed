@@ -20,6 +20,8 @@ fn main() {
     let cb = glutin::ContextBuilder::new();
     let display = glium::Display::new(wb, cb, &events_loop).unwrap();
 
+    let mut typewriter = String::new();
+
     let mut layout = LayoutManager {
         views: vec![
             Box::new(EditorView::new("assets/source.txt", &display)),
@@ -40,6 +42,25 @@ fn main() {
         events_loop.poll_events(|ev| {
             match ev {
                 glutin::Event::WindowEvent { event, .. } => match event {
+                    // Store input content to a global buffer
+                    glutin::WindowEvent::ReceivedCharacter('\r') => {
+                        typewriter.clear();
+                        layout.broadcast_typing(&typewriter);
+                    },
+                    glutin::WindowEvent::ReceivedCharacter(c) => {
+                        if c as u32 == 127 {
+                            typewriter.pop();
+                        } else {
+                            typewriter.push(c);
+                        }
+                        layout.broadcast_typing(&typewriter);
+                    },
+                    // Other window events
+                    glutin::WindowEvent::Resized(logical_size) => {
+                        let hidpi_factor = display.gl_window().window().get_hidpi_factor();
+                        display.gl_window()
+                            .resize(logical_size.to_physical(hidpi_factor));
+                    },
                     glutin::WindowEvent::CloseRequested => closed = true,
                     glutin::WindowEvent::KeyboardInput {
                         input: glutin::KeyboardInput {

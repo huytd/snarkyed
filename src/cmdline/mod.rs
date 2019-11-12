@@ -5,11 +5,7 @@ use glium_glyph::GlyphBrush;
 use glium_glyph::glyph_brush::rusttype::Rect;
 
 use crate::layout_manager::View;
-use crate::constants::{NO_MODIFIERS, CTRL_HOLD, SHIFT_HOLD, CMD_SHIFT_HOLD, BASE_FONT_SIZE};
-
-const BORDER_TEXT: &str = r#"┌──────────────────────────────────────────────────┐
-│                                                  |
-└──────────────────────────────────────────────────┘"#;
+use crate::constants::{NO_MODIFIERS, CMD_SHIFT_HOLD, BASE_FONT_SIZE};
 
 pub struct CmdlineView<'a, 'b> {
     glyph_brush: GlyphBrush<'a, 'b>,
@@ -37,7 +33,7 @@ impl<'a, 'b> CmdlineView<'a, 'b> {
           padding: 30.0,
           font_size: font_size,
           letter_size: letter_size,
-          command_text: "".to_owned(),
+          command_text: "Hello".to_owned(),
           visible: false
         }
     }
@@ -47,22 +43,13 @@ impl<'a, 'b> View for CmdlineView<'a, 'b> {
     fn update(&mut self, display: &Display) {
         let hidpi_factor = display.gl_window().window().get_hidpi_factor() as f32;
         self.font_size = BASE_FONT_SIZE * hidpi_factor;
-
         let screen_dims = display.get_framebuffer_dimensions();
-        self.glyph_brush.queue(Section {
-            text: BORDER_TEXT,
-            bounds: (screen_dims.0 as f32 - self.padding, screen_dims.1 as f32),
-            screen_position: (self.padding / 2.0 + screen_dims.0 as f32 / 4.0, screen_dims.1 as f32 / 2.0 - self.font_size * 2.0),
-            scale: glyph_brush::rusttype::Scale::uniform(self.font_size * 1.2),
-            color: [0.58, 0.89, 0.02, 1.0],
-            ..Section::default()
-        });
 
         self.glyph_brush.queue(Section {
             text: &self.command_text,
             bounds: (screen_dims.0 as f32 - self.padding, screen_dims.1 as f32),
-            screen_position: (self.padding / 2.0 + screen_dims.0 as f32 / 3.8, screen_dims.1 as f32 / 2.0 - self.font_size),
-            scale: glyph_brush::rusttype::Scale::uniform(self.font_size * 1.5),
+            screen_position: (self.padding / 2.0, screen_dims.1 as f32 - self.font_size * 2.0),
+            scale: glyph_brush::rusttype::Scale::uniform(self.font_size),
             color: [0.58, 0.89, 0.02, 1.0],
             ..Section::default()
         });
@@ -76,17 +63,20 @@ impl<'a, 'b> View for CmdlineView<'a, 'b> {
 
     fn handle_input(&mut self, key_code: VirtualKeyCode, state: ElementState, modifiers: ModifiersState) {
         match (key_code, state, modifiers) {
-            (VirtualKeyCode::P, ElementState::Pressed, CMD_SHIFT_HOLD) => {
+            (VirtualKeyCode::P, ElementState::Released, CMD_SHIFT_HOLD) => {
               self.visible = true;
+              self.command_text = String::new();
             },
             (VirtualKeyCode::Escape, ElementState::Pressed, NO_MODIFIERS) => {
               self.visible = false;
             },
             _ => ()
         }
-        // TODO: Implement a proper key to text input handler
-        if self.visible && state == ElementState::Pressed {
-            self.command_text = format!("{}{:?}", self.command_text, key_code);
+    }
+
+    fn typewriting(&mut self, content: &str) {
+        if self.visible {
+            self.command_text = content.to_owned();
         }
     }
 }

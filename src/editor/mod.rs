@@ -130,9 +130,19 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
         self.font_size = BASE_FONT_SIZE * hidpi_factor;
 
         let screen_dims = display.get_framebuffer_dimensions();
-        self.viewport_rows = (screen_dims.1 as f32 / self.font_size) as usize;
+        self.viewport_rows = (screen_dims.1 as f32 / self.font_size) as usize - 2;
 
         let content_to_draw = self.buffer.get_lines(self.offset_y, self.offset_y + self.viewport_rows);
+        let whitespace_content_to_draw = self.buffer.get_lines(self.offset_y, self.offset_y + self.viewport_rows).replace(' ', "·");
+
+        self.glyph_brush.queue(Section {
+            text: &whitespace_content_to_draw,
+            bounds: (screen_dims.0 as f32 - self.padding, screen_dims.1 as f32),
+            screen_position: ((self.padding / 2.0), (self.padding / 2.0)),
+            scale: glyph_brush::rusttype::Scale::uniform(self.font_size),
+            color: [0.92, 0.99, 0.99, 0.1],
+            ..Section::default()
+        });
 
         self.glyph_brush.queue(Section {
             text: &content_to_draw,
@@ -186,4 +196,6 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
             _ => ()
         }
     }
+
+    fn typewriting(&mut self, content: &str) { }
 }
