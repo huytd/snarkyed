@@ -74,9 +74,15 @@ impl<'a, 'b> View for CmdlineView<'a, 'b> {
         }
     }
 
-    fn typewriting(&mut self, content: &str) {
+    fn push_char(&mut self, c: char) {
         if self.visible {
-            self.command_text = content.to_owned();
+            self.command_text.push(c);
+        }
+    }
+
+    fn pop_char(&mut self) {
+        if self.visible {
+            self.command_text.pop();
         }
     }
 }

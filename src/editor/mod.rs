@@ -197,5 +197,11 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
         }
     }
 
-    fn typewriting(&mut self, content: &str) { }
+    fn push_char(&mut self, c: char) {
+
+    }
+
+    fn pop_char(&mut self) {
+
+    }
 }

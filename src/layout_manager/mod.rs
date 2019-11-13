@@ -6,19 +6,15 @@ pub trait View {
   fn update(&mut self, display: &Display);
   fn draw(&mut self, display: &Display, target: &mut Frame);
   fn handle_input(&mut self, key_code: VirtualKeyCode, state: ElementState, modifiers: ModifiersState);
-  fn typewriting(&mut self, content: &str);
+  fn push_char(&mut self, c: char);
+  fn pop_char(&mut self);
 }
 
 pub struct LayoutManager {
   pub views: Vec<Box<dyn View>>,
 }
 
-#[allow(dead_code)]
 impl LayoutManager {
-  pub fn add_view(&mut self, view: Box<dyn View>) {
-    self.views.push(view)
-  }
-
   pub fn update_views(&mut self, display: &Display) {
     for view in self.views.iter_mut() {
       view.update(display);
@@ -37,9 +33,15 @@ impl LayoutManager {
     }
   }
 
-  pub fn broadcast_typing(&mut self, content: &str) {
+  pub fn push_char(&mut self, c: char) {
     for view in self.views.iter_mut() {
-      view.typewriting(&content);
+      view.push_char(c);
+    }
+  }
+
+  pub fn pop_char(&mut self) {
+    for view in self.views.iter_mut() {
+      view.pop_char();
     }
   }
 }
