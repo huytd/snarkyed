@@ -12,6 +12,7 @@ use cursor::Cursor;
 
 use crate::constants::{BASE_FONT_SIZE, CTRL_HOLD, NO_MODIFIERS, SHIFT_HOLD};
 use crate::layout_manager::View;
+use crate::ui;
 
 pub struct EditorView<'a, 'b> {
     pub buffer: Buffer,
@@ -151,7 +152,7 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
             bounds: (screen_dims.0 as f32 - self.padding, screen_dims.1 as f32),
             screen_position: ((self.padding / 2.0), (self.padding / 2.0)),
             scale: glyph_brush::rusttype::Scale::uniform(self.font_size),
-            color: [0.92, 0.99, 0.99, 0.1],
+            color: ui::color::hex("#293940").as_slice(),
             ..Section::default()
         });
 
@@ -160,7 +161,7 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
             bounds: (screen_dims.0 as f32 - self.padding, screen_dims.1 as f32),
             screen_position: ((self.padding / 2.0), (self.padding / 2.0)),
             scale: glyph_brush::rusttype::Scale::uniform(self.font_size),
-            color: [0.92, 0.99, 0.99, 1.0],
+            color: ui::color::hex("#E6FFFF").as_slice(),
             ..Section::default()
         });
 
@@ -175,7 +176,7 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
                 (self.padding / 2.0) + (self.letter_size.height() * self.cursor.row as f32),
             ),
             scale: glyph_brush::rusttype::Scale::uniform(self.font_size),
-            color: [0.92, 0.99, 0.99, 0.4],
+            color: ui::color::hexa("#3A60D7", 0.4).as_slice(),
             ..Section::default()
         });
     }

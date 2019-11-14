@@ -41,7 +41,8 @@ fn main() {
         layout.update_views(&display);
 
         let mut target = display.draw();
-        target.clear_color_srgb(0.14, 0.18, 0.21, 1.0);
+        let color = ui::color::hex("#1B262B");
+        target.clear_color_srgb(color.r, color.g, color.b, color.a);
         layout.draw(&display, &mut target);
         target.finish().unwrap();
 

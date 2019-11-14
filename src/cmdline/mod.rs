@@ -7,6 +7,7 @@ use glium_glyph::GlyphBrush;
 use crate::constants::{BASE_FONT_SIZE, CMD_SHIFT_HOLD, NO_MODIFIERS};
 use crate::layout_manager::View;
 use crate::ui::panel::Panel;
+use crate::ui::color;
 
 pub struct CmdlineView<'a, 'b> {
     glyph_brush: GlyphBrush<'a, 'b>,
@@ -45,7 +46,7 @@ impl<'a, 'b> CmdlineView<'a, 'b> {
             letter_size: letter_size,
             command_text: "Hello".to_owned(),
             visible: false,
-            background: Panel::new(&display, [bg_x, bg_y], [bg_w, bg_h], [0.0, 0.0, 0.0, 0.0]),
+            background: Panel::new(&display, [bg_x, bg_y], [bg_w, bg_h], color::hex("#4A148C").as_slice()),
         }
     }
 }
@@ -63,7 +64,7 @@ impl<'a, 'b> View for CmdlineView<'a, 'b> {
             bounds: (screen_dims.0 as f32 - self.padding, screen_dims.1 as f32),
             screen_position: (text_x, text_y),
             scale: glyph_brush::rusttype::Scale::uniform(self.font_size),
-            color: [0.58, 0.89, 0.02, 1.0],
+            color: color::hex("#FF5F56").as_slice(),
             ..Section::default()
         });
     }
