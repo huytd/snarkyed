@@ -1,16 +1,24 @@
+#[macro_use]
 extern crate glium;
 extern crate glium_glyph;
 
 use glium::{glutin, Surface};
 
-mod constants;
-mod layout_manager;
-mod editor;
 mod cmdline;
+mod constants;
+mod editor;
+mod layout_manager;
+mod ui;
 
-use layout_manager::{ LayoutManager };
-use editor::EditorView;
 use cmdline::CmdlineView;
+use editor::EditorView;
+use layout_manager::LayoutManager;
+
+#[derive(Copy, Clone)]
+pub struct Vertex {
+    position: [f32; 2],
+}
+implement_vertex!(Vertex, position);
 
 fn main() {
     let mut events_loop = glutin::EventsLoop::new();
@@ -23,8 +31,8 @@ fn main() {
     let mut layout = LayoutManager {
         views: vec![
             Box::new(EditorView::new("assets/source.txt", &display)),
-            Box::new(CmdlineView::new(&display))
-        ]
+            Box::new(CmdlineView::new(&display)),
+        ],
     };
 
     let mut closed = false;
@@ -47,21 +55,23 @@ fn main() {
                         } else {
                             layout.push_char(c);
                         }
-                    },
+                    }
                     // Other window events
                     glutin::WindowEvent::Resized(logical_size) => {
                         let hidpi_factor = display.gl_window().window().get_hidpi_factor();
-                        display.gl_window()
+                        display
+                            .gl_window()
                             .resize(logical_size.to_physical(hidpi_factor));
-                    },
+                    }
                     glutin::WindowEvent::CloseRequested => closed = true,
                     glutin::WindowEvent::KeyboardInput {
-                        input: glutin::KeyboardInput {
-                            virtual_keycode: Some(virtual_code),
-                            state,
-                            modifiers,
-                            ..
-                        },
+                        input:
+                            glutin::KeyboardInput {
+                                virtual_keycode: Some(virtual_code),
+                                state,
+                                modifiers,
+                                ..
+                            },
                         ..
                     } => layout.handle_input(virtual_code, state, modifiers),
                     _ => (),

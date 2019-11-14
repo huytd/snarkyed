@@ -1,17 +1,17 @@
 mod buffer;
 mod cursor;
 
-use glium::glutin::{VirtualKeyCode, ElementState, ModifiersState};
+use glium::glutin::{ElementState, ModifiersState, VirtualKeyCode};
 use glium::{Display, Frame};
-use glium_glyph::glyph_brush::{rusttype::Font, Section, GlyphCruncher};
-use glium_glyph::GlyphBrush;
 use glium_glyph::glyph_brush::rusttype::Rect;
+use glium_glyph::glyph_brush::{rusttype::Font, GlyphCruncher, Section};
+use glium_glyph::GlyphBrush;
 
 use buffer::Buffer;
 use cursor::Cursor;
 
+use crate::constants::{BASE_FONT_SIZE, CTRL_HOLD, NO_MODIFIERS, SHIFT_HOLD};
 use crate::layout_manager::View;
-use crate::constants::{ NO_MODIFIERS, CTRL_HOLD, SHIFT_HOLD, BASE_FONT_SIZE };
 
 pub struct EditorView<'a, 'b> {
     pub buffer: Buffer,
@@ -32,11 +32,13 @@ impl<'a, 'b> EditorView<'a, 'b> {
         let hidpi_factor = display.gl_window().window().get_hidpi_factor() as f32;
         let font_size = BASE_FONT_SIZE * hidpi_factor;
         let mut gb = GlyphBrush::new(display, fonts);
-        let letter_size = gb.glyph_bounds(Section {
-            text: "0",
-            scale: glyph_brush::rusttype::Scale::uniform(font_size),
-            ..Section::default()
-        }).unwrap();
+        let letter_size = gb
+            .glyph_bounds(Section {
+                text: "0",
+                scale: glyph_brush::rusttype::Scale::uniform(font_size),
+                ..Section::default()
+            })
+            .unwrap();
 
         EditorView {
             buffer: Buffer::new(file),
@@ -47,7 +49,7 @@ impl<'a, 'b> EditorView<'a, 'b> {
             offset_y: 0,
             viewport_rows: 0,
             letter_size: letter_size,
-            last_column: -1
+            last_column: -1,
         }
     }
 
@@ -97,7 +99,9 @@ impl<'a, 'b> EditorView<'a, 'b> {
     }
 
     fn move_cursor_right(&mut self) {
-        let current_line = self.buffer.get_line_at(self.offset_y + self.cursor.row as usize);
+        let current_line = self
+            .buffer
+            .get_line_at(self.offset_y + self.cursor.row as usize);
         if current_line.len() - 1 > self.cursor.col as usize {
             self.last_column = self.cursor.col;
             self.cursor.col += 1;
@@ -111,7 +115,9 @@ impl<'a, 'b> EditorView<'a, 'b> {
     }
 
     fn move_to_eol(&mut self, try_first: bool) {
-        let current_line = self.buffer.get_line_at(self.offset_y + self.cursor.row as usize);
+        let current_line = self
+            .buffer
+            .get_line_at(self.offset_y + self.cursor.row as usize);
         if try_first {
             if self.cursor.col as usize > current_line.len() {
                 self.last_column = self.cursor.col;
@@ -130,10 +136,15 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
         self.font_size = BASE_FONT_SIZE * hidpi_factor;
 
         let screen_dims = display.get_framebuffer_dimensions();
-        self.viewport_rows = (screen_dims.1 as f32 / self.font_size) as usize - 2;
+        self.viewport_rows = (screen_dims.1 as f32 / self.font_size) as usize;
 
-        let content_to_draw = self.buffer.get_lines(self.offset_y, self.offset_y + self.viewport_rows);
-        let whitespace_content_to_draw = self.buffer.get_lines(self.offset_y, self.offset_y + self.viewport_rows).replace(' ', "·");
+        let content_to_draw = self
+            .buffer
+            .get_lines(self.offset_y, self.offset_y + self.viewport_rows);
+        let whitespace_content_to_draw = self
+            .buffer
+            .get_lines(self.offset_y, self.offset_y + self.viewport_rows)
+            .replace(' ', "·");
 
         self.glyph_brush.queue(Section {
             text: &whitespace_content_to_draw,
@@ -155,8 +166,14 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
 
         self.glyph_brush.queue(Section {
             text: "█",
-            bounds: (screen_dims.0 as f32 - self.padding, screen_dims.1 as f32 - self.padding),
-            screen_position: ((self.padding / 2.0) + (self.letter_size.width() * self.cursor.col as f32), (self.padding / 2.0) + (self.letter_size.height() * self.cursor.row as f32)),
+            bounds: (
+                screen_dims.0 as f32 - self.padding,
+                screen_dims.1 as f32 - self.padding,
+            ),
+            screen_position: (
+                (self.padding / 2.0) + (self.letter_size.width() * self.cursor.col as f32),
+                (self.padding / 2.0) + (self.letter_size.height() * self.cursor.row as f32),
+            ),
             scale: glyph_brush::rusttype::Scale::uniform(self.font_size),
             color: [0.92, 0.99, 0.99, 0.4],
             ..Section::default()
@@ -167,41 +184,42 @@ impl<'a, 'b> View for EditorView<'a, 'b> {
         self.glyph_brush.draw_queued(display, target);
     }
 
-    fn handle_input(&mut self, key_code: VirtualKeyCode, state: ElementState, modifiers: ModifiersState) {
+    fn handle_input(
+        &mut self,
+        key_code: VirtualKeyCode,
+        state: ElementState,
+        modifiers: ModifiersState,
+    ) {
         match (key_code, state, modifiers) {
             (VirtualKeyCode::J, ElementState::Pressed, NO_MODIFIERS) => {
                 self.move_cursor_down();
-            },
+            }
             (VirtualKeyCode::K, ElementState::Pressed, NO_MODIFIERS) => {
-                self.move_cursor_up() ;
-            },
+                self.move_cursor_up();
+            }
             (VirtualKeyCode::H, ElementState::Pressed, NO_MODIFIERS) => {
                 self.move_cursor_left();
-            },
+            }
             (VirtualKeyCode::L, ElementState::Pressed, NO_MODIFIERS) => {
                 self.move_cursor_right();
-            },
+            }
             (VirtualKeyCode::Key0, ElementState::Pressed, NO_MODIFIERS) => {
                 self.move_to_bol();
-            },
+            }
             (VirtualKeyCode::Key4, ElementState::Pressed, SHIFT_HOLD) => {
                 self.move_to_eol(false);
-            },
+            }
             (VirtualKeyCode::J, ElementState::Pressed, CTRL_HOLD) => {
                 self.scroll_down(10);
-            },
+            }
             (VirtualKeyCode::K, ElementState::Pressed, CTRL_HOLD) => {
                 self.scroll_up(10);
-            },
-            _ => ()
+            }
+            _ => (),
         }
     }
 
-    fn push_char(&mut self, c: char) {
+    fn push_char(&mut self, c: char) {}
 
-    }
-
-    fn pop_char(&mut self) {
-
-    }
+    fn pop_char(&mut self) {}
 }
